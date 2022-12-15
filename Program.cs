@@ -302,7 +302,7 @@ namespace TaskManager
                 $"IsBackground:\t{thread.IsBackground}\n\n" +
 
                 (thread.IsAlive ? "PRESS \"a\" to ABORT this THREAD\n" : "") +
-                "PRESS \"b\" to go BACK"
+                "PRESS \"b\" to go BACK\n"
             );
 
         TakeOption:
@@ -391,7 +391,7 @@ namespace TaskManager
                                            ex is OverflowException)
                 {
                     var threadsToAbort = threads.Where(thread => thread.Name == input);
-                    if (threadsToAbort.Count() == 0)
+                    if (!threadsToAbort.Any())
                     {
                         notification += $"Could not identify any thread with `{input}`\n";
                         goto Start;
