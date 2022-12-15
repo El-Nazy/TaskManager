@@ -287,7 +287,7 @@ namespace TaskManager
                 }
                 ShowThreadDetails(thread);
             }
-            ShowPromptToCreateThreadOrShowMain();
+            AskToShowPromptToCreateThreadOrShowMain();
         }
 
         static void ShowThreadDetails(Thread thread)
@@ -407,10 +407,10 @@ namespace TaskManager
                 goto Start;
             }
 
-            ShowPromptToCreateThreadOrShowMain();
+            AskToShowPromptToCreateThreadOrShowMain();
         }
 
-        static void ShowPromptToCreateThreadOrShowMain()
+        static void AskToShowPromptToCreateThreadOrShowMain()
         {
         TakeOption:
             switch (Console.ReadKey().KeyChar.ToString().ToLower())
