@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace TaskManager
 {
-    internal class Program
+    static class Program
     {
         static string notification = "";
         static List<Thread> threads = new List<Thread>();
@@ -58,7 +58,7 @@ namespace TaskManager
 
         static string GetAndClearNotifications()
         {
-            var result = $"{(notification == "" ? "" : ("NOTIFICATION(S):\n" + notification + "\n"))}"; ;
+            var result = (notification == "" ? "" : ("NOTIFICATION(S):\n" + notification + "\n"));
 
             // Clear Notifications
             notification = "";
@@ -257,12 +257,13 @@ namespace TaskManager
             Console.Clear();
             Console.WriteLine(
                 GetNumberedListOfAllCreatedThreads() +
-                
+
                 $"\n\n" +
 
                 GetAndClearNotifications() +
 
-                $"{(threads.Any() ? "ENTER the S/N of the THREAD to VIEW more DETAILS" : "PRESS \"c\" to create a THREAD")}\n" +
+                (threads.Any() ? "ENTER the S/N of the THREAD to VIEW more DETAILS\n" :
+                    "PRESS \"c\" to create a THREAD\n") +
                 "Or PRESS \"enter\" to go BACK to the MAIN MENU"
             );
 
@@ -364,10 +365,13 @@ namespace TaskManager
                 GetNumberedListOfAllCreatedThreads() +
 
                 $"\n\n" +
-                
+
                 GetAndClearNotifications() +
 
-                $"{(threads.Any() ? "ENTER the S/N of the THREAD to VIEW more DETAILS\n(NB: S/N takes precedence over NAME in case of a conflict)" : "PRESS \"c\" to create a THREAD")}\n" +
+                (threads.Any() ? "ENTER the S/N of the THREAD to VIEW more DETAILS\n" +
+                    "(NB: S/N takes precedence over NAME in case of a conflict)\n"
+                :
+                    "PRESS \"c\" to create a THREAD\n") +
                 "0r PRESS \"enter\" to go BACK\n"
             );
 
@@ -403,7 +407,7 @@ namespace TaskManager
                         return true;
                     });
                 }
-            
+
                 goto Start;
             }
 
