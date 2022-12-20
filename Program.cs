@@ -9,7 +9,7 @@ namespace TaskManager
 {
     static class Program
     {
-        static string notification = "";
+        static StringBuilder notification = new StringBuilder();
         static List<Thread> threads = new List<Thread>();
 
         static void Main()
@@ -58,10 +58,10 @@ namespace TaskManager
 
         static string GetAndClearNotifications()
         {
-            var result = (notification == "" ? "" : ("NOTIFICATION(S):\n" + notification + "\n"));
+            var result = (notification.Length == 0 ? "" : ("NOTIFICATION(S):\n" + notification + "\n"));
 
             // Clear Notifications
-            notification = "";
+            notification.Clear();
 
             return result;
         }
@@ -102,13 +102,12 @@ namespace TaskManager
             var result = new StringBuilder();
 
             result.Append("PIDs\tProcess Names\n");
-            Process.GetProcesses()
-                .OrderBy(process => process.Id)
-                .All(process =>
-                {
-                    result.Append($"{process.Id}\t{process.ProcessName}\n");
-                    return true;
-                });
+            var processes = Process.GetProcesses().OrderBy(process => process.Id);
+
+            foreach (var process in processes)
+            {
+                result.Append($"{process.Id}\t{process.ProcessName}\n");
+            }
 
             return result.ToString();
         }
@@ -132,7 +131,7 @@ namespace TaskManager
             // Collect key input and perform action
             var input = Console.ReadLine();
 
-            if (input == "")
+            if (String.IsNullOrEmpty(input))
             {
                 Main();
             }
@@ -141,7 +140,7 @@ namespace TaskManager
             {
                 var process = Process.GetProcessById(int.Parse(input));
                 process.Kill();
-                notification += $"Process with PID `{process.Id}` and name `{process.ProcessName}` was killed successfully\n";
+                notification.Append($"Process with PID `{process.Id}` and name `{process.ProcessName}` was killed successfully\n");
             }
             // Catch ArgumentException from Process.GetProcessById
             catch (Exception ex) when (ex is ArgumentException ||
@@ -152,17 +151,16 @@ namespace TaskManager
                 var processes = Process.GetProcessesByName(input);
                 if (processes.Length == 0)
                 {
-                    notification += $"Failed to kill the process(es) you identified with `{input}`\n";
+                    notification.Append($"Failed to kill the process(es) you identified with `{input}`\n");
                     goto Start;
                 }
 
-                processes.All(process =>
+                foreach (var process in processes)
                 {
                     process.Kill();
-                    notification += $"Process with PID {process.Id} name {process.ProcessName}" +
-                    " was killed successfully\n";
-                    return true;
-                });
+                    notification.Append($"Process with PID {process.Id} name {process.ProcessName}" +
+                        " was killed successfully\n");
+                }
             }
 
             goto Start;
@@ -183,7 +181,7 @@ namespace TaskManager
 
             var input = Console.ReadLine();
 
-            if (input == "")
+            if (String.IsNullOrEmpty(input))
             {
                 Main();
             }
@@ -191,12 +189,12 @@ namespace TaskManager
             try
             {
                 var process = Process.Start(input);
-                notification += $"Process started successfully with PID \"{process.Id}\"\n";
+                notification.Append($"Process started successfully with PID \"{process.Id}\"\n");
                 Main();
             }
             catch (Exception)
             {
-                notification += $"Failed to start a process with the path \"{input}\"; try again\n";
+                notification.Append($"Failed to start a process with the path \"{input}\"; try again\n");
                 goto Start;
             }
         }
@@ -216,7 +214,7 @@ namespace TaskManager
 
             var input = Console.ReadLine();
 
-            if (input == "")
+            if (String.IsNullOrEmpty(input))
             {
                 Main();
                 return;
@@ -240,7 +238,7 @@ namespace TaskManager
                     goto case "f";
                 case "f":
                     thread.Start();
-                    notification += $"Thread \"{input}\" create successfully\n";
+                    notification.Append($"Thread \"{input}\" create successfully\n");
                     threads.Add(thread);
                     Main();
                     return;
@@ -271,7 +269,7 @@ namespace TaskManager
             {
                 var input = Console.ReadLine();
 
-                if (input == "")
+                if (String.IsNullOrEmpty(input))
                 {
                     Main();
                 }
@@ -283,7 +281,7 @@ namespace TaskManager
                 }
                 catch (Exception)
                 {
-                    notification += "You entered an invalid S/N; try again\n";
+                    notification.Append("You entered an invalid S/N; try again\n");
                     goto Start;
                 }
                 ShowThreadDetails(thread);
@@ -329,11 +327,11 @@ namespace TaskManager
                 {
                     thread.Abort();
                     threads.Remove(thread);
-                    notification += $"THREAD with {(S_N is null ? "" : $"S/N `{S_N}` and ")}name `{thread.Name}` was aborted successfully\n";
+                    notification.Append($"THREAD with {(S_N is null ? "" : $"S/N `{S_N}` and ")}name `{thread.Name}` was aborted successfully\n");
                 }
                 catch (Exception ex)
                 {
-                    notification += $"Unable to abort THREAD with name `{thread.Name}` cause;\n{ex.Message}\n";
+                    notification.Append($"Unable to abort THREAD with name `{thread.Name}` cause;\n{ex.Message}\n");
                 }
             }
         }
@@ -380,7 +378,7 @@ namespace TaskManager
                 // Collect key input and perform action
                 var input = Console.ReadLine();
 
-                if (input == "")
+                if (String.IsNullOrEmpty(input))
                 {
                     Main();
                 }
@@ -397,15 +395,14 @@ namespace TaskManager
                     var threadsToAbort = threads.Where(thread => thread.Name == input);
                     if (!threadsToAbort.Any())
                     {
-                        notification += $"Could not identify any thread with `{input}`\n";
+                        notification.Append($"Could not identify any thread with `{input}`\n");
                         goto Start;
                     }
 
-                    threadsToAbort.All(thread =>
+                    foreach (var thread in threadsToAbort)
                     {
                         TryAbortThread(thread);
-                        return true;
-                    });
+                    }
                 }
 
                 goto Start;
